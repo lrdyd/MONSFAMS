@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MONSFAMS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; min-height: 100vh; background: #1a1a1a; padding: 20px; color: white; }
+        .container { max-width: 900px; width: 100%; margin: 0 auto; }
+
+        /* Login */
+        .login { max-width: 350px; margin: 80px auto; text-align: center; }
+        .login h1 { font-size: 1.5rem; margin-bottom: 20px; color: #feca57; }
+        .login input { width: 100%; padding: 14px 18px; font-size: 1rem; color: white; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; outline: none; margin-bottom: 15px; }
+        .login input:focus { border-color: #feca57; }
+        .login button { width: 100%; padding: 14px; font-size: 1rem; font-weight: 600; color: #1a1a1a; background: linear-gradient(135deg, #feca57, #ff9f43); border: none; border-radius: 10px; cursor: pointer; }
+        .login button:hover { transform: translateY(-2px); }
+        .login .error { color: #e94560; font-size: 0.85rem; margin-top: 10px; display: none; }
+        .login .error.show { display: block; }
+        .login .back-link { display: block; margin-top: 20px; color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.85rem; transition: color 0.3s; }
+        .login .back-link:hover { color: rgba(255,255,255,0.7); }
+        .login-icon { width: 70px; height: 70px; background: linear-gradient(135deg, #feca57, #ff9f43); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; font-size: 35px; }
+
+        /* Dashboard */
+        .dashboard { display: none; }
+        .dashboard.active { display: block; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
+        .header h1 { font-size: 1.5rem; background: linear-gradient(90deg, #feca57, #ff9f43); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+        .badge { padding: 6px 14px; font-size: 0.8rem; font-weight: 600; background: linear-gradient(135deg, #feca57, #ff9f43); border-radius: 15px; }
+        .logout { padding: 8px 16px; font-size: 0.85rem; color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; cursor: pointer; }
+        .logout:hover { background: rgba(233,69,96,0.2); border-color: rgba(233,69,96,0.5); color: #ff6b6b; }
+
+        /* Settings */
+        .settings-form { display: flex; flex-direction: column; gap: 20px; }
+        .setting-item { }
+        .setting-item label { display: block; font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 10px; }
+        .setting-row { display: flex; gap: 10px; }
+        .setting-row input { flex: 1; padding: 12px 16px; font-size: 0.95rem; color: white; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; outline: none; }
+        .setting-row input:focus { border-color: #feca57; }
+        .setting-btn { padding: 12px 20px; font-size: 0.9rem; font-weight: 600; color: #1a1a1a; background: linear-gradient(135deg, #feca57, #ff9f43); border: none; border-radius: 10px; cursor: pointer; white-space: nowrap; }
+        .setting-btn:hover { transform: translateY(-2px); }
+        .setting-hint { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 8px; }
+
+        /* Server Status */
+        .server-status { display: flex; align-items: center; gap: 10px; padding: 12px 18px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 20px; font-size: 0.9rem; }
+        .server-status .dot { width: 10px; height: 10px; border-radius: 50%; background: #e94560; }
+        .server-status.connected .dot { background: #4CAF50; }
+        .server-status input { flex: 1; padding: 8px 12px; font-size: 0.85rem; color: white; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; outline: none; }
+        .server-status button { padding: 8px 16px; font-size: 0.85rem; color: white; background: linear-gradient(135deg, #feca57, #ff9f43); border: none; border-radius: 8px; cursor: pointer; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 10px 25px; font-size: 0.9rem; font-weight: 600; color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; cursor: pointer; transition: all 0.3s; }
+        .tab:hover { background: rgba(255,255,255,0.1); }
+        .tab.active { color: #1a1a1a; background: linear-gradient(135deg, #feca57, #ff9f43); border-color: transparent; }
+        .tab.green.active { color: white; background: linear-gradient(135deg, #4CAF50, #45a049); }
+        .tab-count { font-size: 0.75rem; background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 8px; margin-left: 5px; }
+        .tab.active .tab-count { background: rgba(0,0,0,0.3); }
+
+        /* Stats */
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .stat { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; text-align: center; }
+        .stat-value { font-size: 1.8rem; font-weight: 700; color: #feca57; }
+        .stat.green .stat-value { color: #4CAF50; }
+        .stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-top: 5px; }
+
+        /* Section */
+        .section { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 25px; margin-bottom: 20px; }
+        .section h2 { font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .section h2 span { font-size: 0.8rem; padding: 4px 12px; border-radius: 15px; font-weight: 600; }
+        .section h2 .green { background: linear-gradient(135deg, #4CAF50, #45a049); }
+        .section h2 .gold { background: linear-gradient(135deg, #feca57, #ff9f43); color: #1a1a1a; }
+        .section.green { border-color: rgba(76,175,80,0.3); }
+        .section.gold { border-color: rgba(254,202,87,0.3); }
+
+        /* Upload */
+        .upload input[type="text"] { width: 100%; padding: 12px 16px; font-size: 0.95rem; color: white; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; outline: none; margin-bottom: 15px; }
+        .upload input[type="text"]:focus { border-color: #feca57; }
+        .upload.green input[type="text"]:focus { border-color: #4CAF50; }
+        .upload-row { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .upload-btn { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: rgba(254,202,87,0.2); border: 2px solid rgba(254,202,87,0.5); border-radius: 12px; cursor: pointer; transition: all 0.3s; font-size: 20px; }
+        .upload-btn:hover { background: rgba(254,202,87,0.3); border-color: #feca57; }
+        .upload-btn.green { background: rgba(76,175,80,0.2); border-color: rgba(76,175,80,0.5); }
+        .upload-btn.green:hover { background: rgba(76,175,80,0.3); border-color: #4CAF50; }
+        .upload-label { color: rgba(255,255,255,0.5); font-size: 0.9rem; }
+        .upload-label span { color: #feca57; }
+        .upload.green .upload-label span { color: #4CAF50; }
+        .file-selected { display: none; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(254,202,87,0.1); border: 1px solid rgba(254,202,87,0.3); border-radius: 10px; margin-bottom: 15px; }
+        .file-selected.show { display: flex; }
+        .file-selected.green { background: rgba(76,175,80,0.1); border-color: rgba(76,175,80,0.3); }
+        .file-selected-info { display: flex; align-items: center; gap: 10px; }
+        .file-selected-icon { width: 35px; height: 35px; background: linear-gradient(135deg, #feca57, #ff9f43); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .file-selected-icon.green { background: linear-gradient(135deg, #4CAF50, #45a049); }
+        .file-selected-name { font-size: 0.9rem; }
+        .file-selected-size { font-size: 0.8rem; color: rgba(255,255,255,0.4); }
+        .file-selected-remove { background: none; border: none; color: rgba(255,255,255,0.4); font-size: 20px; cursor: pointer; }
+        .file-selected-remove:hover { color: #e94560; }
+        .upload button { padding: 12px 30px; font-size: 0.95rem; font-weight: 600; color: #1a1a1a; background: linear-gradient(135deg, #feca57, #ff9f43); border: none; border-radius: 25px; cursor: pointer; }
+        .upload button:hover { transform: translateY(-2px); }
+        .upload button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .upload.green button { color: white; }
+        #fileInput, #premiumFileInput { display: none; }
+        .upload-progress { display: none; margin-top: 15px; }
+        .upload-progress.show { display: block; }
+        .progress-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #4CAF50, #45a049); width: 0%; transition: width 0.3s; }
+        .progress-text { font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 8px; }
+
+        /* Files */
+        .files-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .files h3 { font-size: 1rem; }
+        .files-actions { display: flex; gap: 10px; }
+        .refresh { padding: 6px 12px; font-size: 0.8rem; color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 15px; cursor: pointer; }
+        .delete-all { padding: 6px 12px; font-size: 0.8rem; color: white; background: linear-gradient(135deg, #e94560, #ff6b6b); border: none; border-radius: 15px; cursor: pointer; }
+        .files-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; max-height: 500px; overflow-y: auto; }
+        .file-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; text-align: center; transition: all 0.3s; }
+        .file-card:hover { border-color: rgba(254,202,87,0.3); }
+        .file-card.green:hover { border-color: rgba(76,175,80,0.3); }
+        .file-card-icon { width: 50px; height: 50px; background: linear-gradient(135deg, #feca57, #ff9f43); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 24px; }
+        .file-card-icon.green { background: linear-gradient(135deg, #4CAF50, #45a049); }
+        .file-card-name { font-size: 0.95rem; font-weight: 500; margin-bottom: 5px; word-break: break-word; }
+        .file-card-size { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-bottom: 3px; }
+        .file-card-date { font-size: 0.75rem; color: rgba(255,255,255,0.3); margin-bottom: 12px; }
+        .file-card-actions { display: flex; gap: 8px; justify-content: center; }
+        .file-card-btn { padding: 6px 14px; font-size: 0.8rem; font-weight: 600; border: none; border-radius: 15px; cursor: pointer; text-decoration: none; }
+        .file-card-btn.download { color: #1a1a1a; background: linear-gradient(135deg, #feca57, #ff9f43); }
+        .file-card-btn.download.green { color: white; background: linear-gradient(135deg, #4CAF50, #45a049); }
+        .file-card-btn.delete { color: white; background: linear-gradient(135deg, #e94560, #ff6b6b); }
+        .empty-state { grid-column: 1 / -1; text-align: center; padding: 50px; color: rgba(255,255,255,0.3); }
+
+        /* Modal */
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-content { background: #2a2a2a; border: 1px solid rgba(254,202,87,0.3); border-radius: 16px; padding: 30px; max-width: 350px; width: 90%; text-align: center; }
+        .modal-icon { font-size: 40px; margin-bottom: 15px; }
+        .modal h3 { font-size: 1.2rem; margin-bottom: 10px; }
+        .modal p { font-size: 0.9rem; color: rgba(255,255,255,0.5); margin-bottom: 20px; }
+        .modal-actions { display: flex; gap: 10px; justify-content: center; }
+        .modal-btn { padding: 10px 25px; font-size: 0.9rem; font-weight: 600; border: none; border-radius: 20px; cursor: pointer; }
+        .modal-btn.cancel { color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.1); }
+        .modal-btn.confirm { color: white; background: linear-gradient(135deg, #e94560, #ff6b6b); }
+
+        /* Toast */
+        .toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 10px; font-size: 0.9rem; animation: slide 0.3s; z-index: 2000; }
+        .toast.success { background: rgba(76,175,80,0.9); }
+        .toast.error { background: rgba(233,69,96,0.9); }
+        @keyframes slide { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Folders */
+        .folders-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: flex-start; align-content: flex-start; }
+        .folder-btn { padding: 10px 20px; font-size: 0.9rem; font-weight: 600; color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); border-radius: 25px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+        .folder-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+        .folder-btn.active { color: #1a1a1a; background: linear-gradient(135deg, #feca57, #ff9f43); border-color: transparent; }
+        .folder-btn.green.active { color: white; background: linear-gradient(135deg, #4CAF50, #45a049); }
+        .folder-btn .count { font-size: 0.75rem; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 10px; }
+        .folder-btn.active .count { background: rgba(0,0,0,0.3); }
+        .folder-btn .folder-actions { display: none; margin-left: 5px; }
+        .folder-btn:hover .folder-actions { display: inline-flex; gap: 4px; }
+        .folder-btn .folder-actions button { background: none; border: none; color: inherit; cursor: pointer; padding: 2px; font-size: 0.8rem; opacity: 0.7; }
+        .folder-btn .folder-actions button:hover { opacity: 1; }
+        .folder-btn[data-depth="1"] { margin-left: 20px; }
+        .folder-btn[data-depth="2"] { margin-left: 40px; }
+        .folder-btn[data-depth="3"] { margin-left: 60px; }
+        .folder-btn .parent-path { font-size: 0.7rem; color: rgba(255,255,255,0.3); font-weight: normal; }
+        .folder-btn.active .parent-path { color: rgba(0,0,0,0.4); }
+        .new-folder-btn { padding: 10px 20px; font-size: 0.9rem; font-weight: 600; color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.3); border-radius: 25px; cursor: pointer; transition: all 0.2s; }
+        .new-folder-btn:hover { border-color: #feca57; color: #feca57; }
+
+        /* Folders List (Grid View) */
+        .folders-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+        .folder-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; cursor: pointer; transition: all 0.2s; position: relative; }
+        .folder-card:hover { border-color: rgba(254,202,87,0.3); background: rgba(255,255,255,0.08); }
+        .folder-card.selected { border-color: #feca57; background: rgba(254,202,87,0.1); }
+        .folder-card.green:hover { border-color: rgba(76,175,80,0.3); }
+        .folder-card.green.selected { border-color: #4CAF50; background: rgba(76,175,80,0.1); }
+        .folder-card-checkbox { position: absolute; top: 8px; right: 8px; }
+        .folder-card-checkbox input[type="checkbox"] { width: 18px; height: 18px; accent-color: #feca57; cursor: pointer; }
+        .folder-card.green .folder-card-checkbox input[type="checkbox"] { accent-color: #4CAF50; }
+        .folder-card-icon { font-size: 30px; margin-bottom: 8px; }
+        .folder-card-name { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; word-break: break-word; }
+        .folder-card-path { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-bottom: 8px; }
+        .folder-card-count { font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+        .folder-card-count span { color: #feca57; font-weight: 600; }
+        .folder-card.green .folder-card-count span { color: #4CAF50; }
+        .folder-card-actions { display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end; }
+        .folder-card-btn { padding: 5px 12px; font-size: 0.75rem; font-weight: 600; border: none; border-radius: 15px; cursor: pointer; }
+        .folder-card-btn.subfolder { color: white; background: rgba(255,255,255,0.1); }
+        .folder-card-btn.subfolder:hover { background: rgba(255,255,255,0.2); }
+        .folder-card-btn.edit { color: white; background: rgba(100,100,255,0.3); }
+        .folder-card-btn.edit:hover { background: rgba(100,100,255,0.5); }
+        .folder-card-btn.delete { color: white; background: linear-gradient(135deg, #e94560, #ff6b6b); }
+        .folder-card-btn.delete:hover { transform: scale(1.05); }
+        .folder-card-empty { text-align: center; padding: 30px; color: rgba(255,255,255,0.3); font-size: 0.9rem; }
+        .upload-folder-select { flex: 1; padding: 12px 16px; font-size: 0.95rem; color: white; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; outline: none; }
+        .upload-folder-select:focus { border-color: #feca57; }
+
+        /* Files - Updated with checkbox */
+        .files-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; max-height: 600px; overflow-y: auto; padding: 5px; }
+        .file-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; text-align: center; transition: all 0.3s; position: relative; }
+        .file-card:hover { border-color: rgba(254,202,87,0.3); }
+        .file-card.green:hover { border-color: rgba(76,175,80,0.3); }
+        .file-card.selected { border-color: #feca57; background: rgba(254,202,87,0.1); }
+        .file-card.green.selected { border-color: #4CAF50; background: rgba(76,175,80,0.1); }
+        .file-card-checkbox { position: absolute; top: 10px; left: 10px; z-index: 10; }
+        .file-card-checkbox input[type="checkbox"] { width: 20px; height: 20px; accent-color: #feca57; cursor: pointer; }
+        .file-card.green .file-card-checkbox input[type="checkbox"] { accent-color: #4CAF50; }
+        .file-card-icon { width: 50px; height: 50px; background: linear-gradient(135deg, #feca57, #ff9f43); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 24px; }
+        .file-card-icon.green { background: linear-gradient(135deg, #4CAF50, #45a049); }
+        .file-card-name { font-size: 0.95rem; font-weight: 500; margin-bottom: 5px; word-break: break-word; }
+        .file-card-size { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-bottom: 3px; }
+        .file-card-date { font-size: 0.75rem; color: rgba(255,255,255,0.3); margin-bottom: 5px; }
+        .file-card-folder { font-size: 0.7rem; color: rgba(255,255,255,0.2); margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .file-card-folder .folder-badge { background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 10px; }
+        .file-card-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+        .file-card-btn { padding: 6px 14px; font-size: 0.8rem; font-weight: 600; border: none; border-radius: 15px; cursor: pointer; text-decoration: none; }
+        .file-card-btn.download { color: #1a1a1a; background: linear-gradient(135deg, #feca57, #ff9f43); }
+        .file-card-btn.download.green { color: white; background: linear-gradient(135deg, #4CAF50, #45a049); }
+        .file-card-btn.delete { color: white; background: linear-gradient(135deg, #e94560, #ff6b6b); }
+        .empty-state { grid-column: 1 / -1; text-align: center; padding: 50px; color: rgba(255,255,255,0.3); }
+
+        /* Selection Bar */
+        .selection-bar { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 15px 20px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+        .selection-info { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+        .selection-info span { color: #feca57; font-weight: 600; }
+        .selection-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .select-all-btn { padding: 8px 16px; font-size: 0.85rem; color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; cursor: pointer; transition: all 0.2s; }
+        .select-all-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+        .delete-selected-btn { padding: 8px 16px; font-size: 0.85rem; font-weight: 600; color: white; background: linear-gradient(135deg, #e94560, #ff6b6b); border: none; border-radius: 20px; cursor: pointer; transition: all 0.2s; display: none; }
+        .delete-selected-btn.show { display: inline-flex; align-items: center; gap: 6px; }
+        .delete-selected-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(233,69,96,0.4); }
+
+        /* Modal - Updated */
+        .modal-btn.confirm-green { color: white; background: linear-gradient(135deg, #4CAF50, #45a049); }
+        .modal input[type="text"] { width: 100%; padding: 12px 16px; font-size: 0.95rem; color: white; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; outline: none; margin-bottom: 15px; }
+        .modal input[type="text"]:focus { border-color: #feca57; }
+
+        /* Stats - 4 columns */
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login -->
+        <div class="login" id="loginBox">
+            <a href="index.html" style="text-decoration: none; color: inherit;">
+                <div class="login-icon">⚙️</div>
+                <h1>MONSFAMS</h1>
+            </a>
+            <input type="text" id="adminId" placeholder="Enter Admin ID..." autocomplete="username">
+            <input type="password" id="password" placeholder="Enter password..." autocomplete="current-password">
+            <button onclick="login()">Login</button>
+            <p class="error" id="loginError">Incorrect ID or Password</p>
+            <a href="index.html" class="back-link">← Back to Home</a>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard" id="dashboard">
+            <div class="header">
+                <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <h1>MONSFAMS</h1>
+                </a>
+                <div class="header-actions">
+                    <span class="badge">v1.0</span>
+                    <button class="logout" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <!-- Server Status -->
+            <div class="server-status" id="serverStatus">
+                <div class="dot"></div>
+                <span id="serverText">Auto-detecting server...</span>
+                <input type="text" id="serverUrl" placeholder="http://localhost:3000" style="display:none;">
+                <button onclick="autoConnectServer()" title="Reconnect">🔄</button>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab green active" onclick="switchTab('free')" id="freeTab">
+                    <span>🟢</span> Free <span id="freeTabCount" class="tab-count">0</span>
+                </button>
+                <button class="tab" onclick="switchTab('premium')" id="premiumTab">
+                    <span>⭐</span> Premium <span id="premiumTabCount" class="tab-count">0</span>
+                </button>
+            </div>
+
+            <!-- Settings Section -->
+            <div class="section">
+                <h2>⚙️ Settings</h2>
+                <div class="settings-form">
+                    <div class="setting-item">
+                        <label>Premium Password</label>
+                        <div class="setting-row">
+                            <input type="password" id="newPremiumPassword" placeholder="New password (min 3 characters)">
+                            <button class="setting-btn" onclick="changePremiumPassword()">Save</button>
+                        </div>
+                        <p class="setting-hint">Password saat ini: <span id="currentPremiumPassword">Loading...</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('free')">Free Files</button>
+                <button class="tab" onclick="switchTab('premium')">Premium Files</button>
+            </div>
+
+            <!-- Free Section -->
+            <div id="freeSection">
+                <div class="stats">
+                    <div class="stat green">
+                        <div class="stat-value" id="freeCount">0</div>
+                        <div class="stat-label">Files</div>
+                    </div>
+                    <div class="stat green">
+                        <div class="stat-value" id="freeSize">0 B</div>
+                        <div class="stat-label">Size</div>
+                    </div>
+                    <div class="stat green">
+                        <div class="stat-value" id="freeDownloads">0</div>
+                        <div class="stat-label">Downloads</div>
+                    </div>
+                    <div class="stat green">
+                        <div class="stat-value" id="freeFolders">0</div>
+                        <div class="stat-label">Folders</div>
+                    </div>
+                </div>
+
+                <!-- Folders Section -->
+                <div class="section green">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h2>📂 Folders</h2>
+                        <div class="files-actions">
+                            <button class="delete-all" onclick="confirmDeleteSelectedFolders('free')" id="freeDeleteSelectedFoldersBtn" style="display: none;">
+                                🗑️ Delete Selected
+                            </button>
+                            <button class="new-folder-btn" onclick="openNewFolderModal('free')" style="border-style: solid; border-color: #4CAF50; color: #4CAF50;">+ New Folder</button>
+                        </div>
+                    </div>
+                    <div class="folders-list" id="freeFoldersList"></div>
+                </div>
+
+                <div class="section green">
+                    <h2>Upload <span class="green">Free</span></h2>
+                    <div class="upload green">
+                        <input type="text" id="freeFileName" placeholder="File name (optional)">
+                        <div class="upload-row">
+                            <select class="upload-folder-select" id="freeUploadFolder">
+                                <option value="all">All Files</option>
+                            </select>
+                            <button class="upload-btn green" onclick="document.getElementById('fileInput').click()">⬆</button>
+                        </div>
+                        <p class="upload-label">Select file(s) <span>(all formats, multiple allowed)</span></p>
+                        <input type="file" id="fileInput" multiple>
+                        <div class="file-selected green" id="freeFileSelected">
+                            <div class="file-selected-info">
+                                <div class="file-selected-icon green">📦</div>
+                                <div>
+                                    <div class="file-selected-name" id="freeSelectedName"></div>
+                                    <div class="file-selected-size" id="freeSelectedSize"></div>
+                                </div>
+                            </div>
+                            <button class="file-selected-remove" onclick="clearFile('free')">&times;</button>
+                        </div>
+                        <button class="submit-btn" id="freeUploadBtn" onclick="uploadFiles('free')" disabled>Upload</button>
+                        <div class="upload-progress" id="freeProgress">
+                            <div class="progress-bar"><div class="progress-fill" id="freeProgressBar"></div></div>
+                            <p class="progress-text" id="freeProgressText">Uploading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section green">
+                    <!-- Selection Bar for Files -->
+                    <div class="selection-bar" id="freeFilesSelectionBar" style="display: none;">
+                        <div class="selection-info">
+                            <span id="freeSelectedCount">0</span> selected
+                        </div>
+                        <div class="selection-actions">
+                            <button class="select-all-btn" id="freeSelectAllBtn" onclick="toggleSelectAllFiles('free')">Select All</button>
+                            <button class="delete-selected-btn" id="freeDeleteSelectedBtn" onclick="deleteSelectedFiles('free')">
+                                🗑️ Delete Selected
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="files-header">
+                        <h3>Manage Free Files <span id="freeCurrentFolder"></span></h3>
+                        <div class="files-actions">
+                            <button class="refresh" onclick="loadFiles('free')">🔄 Refresh</button>
+                            <button class="delete-all" onclick="confirmDeleteAll('free')">🗑️ Delete All</button>
+                        </div>
+                    </div>
+                    <div class="files-grid" id="freeFilesGrid"></div>
+                </div>
+            </div>
+
+            <!-- Premium Section -->
+            <div id="premiumSection" style="display:none;">
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value" id="premiumCount">0</div>
+                        <div class="stat-label">Files</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="premiumSize">0 B</div>
+                        <div class="stat-label">Size</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="premiumDownloads">0</div>
+                        <div class="stat-label">Downloads</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="premiumFolders">0</div>
+                        <div class="stat-label">Folders</div>
+                    </div>
+                </div>
+
+                <!-- Folders Section -->
+                <div class="section gold">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h2>📂 Folders</h2>
+                        <div class="files-actions">
+                            <button class="delete-all" onclick="confirmDeleteSelectedFolders('premium')" id="premiumDeleteSelectedFoldersBtn" style="display: none;">
+                                🗑️ Delete Selected
+                            </button>
+                            <button class="new-folder-btn" onclick="openNewFolderModal('premium')" style="border-style: solid; border-color: #feca57; color: #feca57;">+ New Folder</button>
+                        </div>
+                    </div>
+                    <div class="folders-list" id="premiumFoldersList"></div>
+                </div>
+
+                <div class="section gold">
+                    <h2>Upload <span class="gold">Premium</span></h2>
+                    <div class="upload">
+                        <input type="text" id="premiumFileName" placeholder="File name (optional)">
+                        <div class="upload-row">
+                            <select class="upload-folder-select" id="premiumUploadFolder">
+                                <option value="all">All Files</option>
+                            </select>
+                            <button class="upload-btn" onclick="document.getElementById('premiumFileInput').click()">⬆</button>
+                        </div>
+                        <p class="upload-label">Select file(s) <span>(all formats, multiple allowed)</span></p>
+                        <input type="file" id="premiumFileInput" multiple>
+                        <div class="file-selected" id="premiumFileSelected">
+                            <div class="file-selected-info">
+                                <div class="file-selected-icon">📦</div>
+                                <div>
+                                    <div class="file-selected-name" id="premiumSelectedName"></div>
+                                    <div class="file-selected-size" id="premiumSelectedSize"></div>
+                                </div>
+                            </div>
+                            <button class="file-selected-remove" onclick="clearFile('premium')">&times;</button>
+                        </div>
+                        <button class="submit-btn" id="premiumUploadBtn" onclick="uploadFiles('premium')" disabled>Upload</button>
+                        <div class="upload-progress" id="premiumProgress">
+                            <div class="progress-bar"><div class="progress-fill" id="premiumProgressBar"></div></div>
+                            <p class="progress-text" id="premiumProgressText">Uploading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section gold">
+                    <div class="files-header">
+                        <h3>Manage Premium Files <span id="premiumCurrentFolder"></span></h3>
+                        <div class="files-actions">
+                            <button class="refresh" onclick="loadFiles('premium')">🔄 Refresh</button>
+                            <button class="delete-all" onclick="confirmDeleteAll('premium')">🗑️ Delete All</button>
+                        </div>
+                    </div>
+                    <div class="files-grid" id="premiumFilesGrid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Selected Confirmation Modal -->
+    <div class="modal" id="deleteSelectedModal">
+        <div class="modal-content">
+            <div class="modal-icon">⚠️</div>
+            <h3>Delete Selected Files?</h3>
+            <p id="deleteSelectedCountText">Are you sure you want to delete the selected files?</p>
+            <input type="hidden" id="deleteSelectedType">
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeDeleteSelectedModal()">Cancel</button>
+                <button class="modal-btn confirm" onclick="doDeleteSelected()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Folder Modal -->
+    <div class="modal" id="newFolderModal">
+        <div class="modal-content">
+            <div class="modal-icon">📁</div>
+            <h3>Create New Folder</h3>
+
+            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-bottom: 8px;">Folder name:</p>
+            <input type="text" id="newFolderName" placeholder="Enter folder name..." style="margin-bottom: 15px;">
+
+            <input type="hidden" id="newFolderType">
+            <input type="hidden" id="newFolderParentId">
+
+            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-bottom: 8px;">Create in:</p>
+            <select id="newFolderParentSelect" class="upload-folder-select" style="margin-bottom: 15px;" onchange="updateNewFolderParent()">
+                <option value="">Root (All Files)</option>
+            </select>
+
+            <details style="margin-bottom: 15px;">
+                <summary style="cursor: pointer; color: rgba(255,255,255,0.6); font-size: 0.85rem; padding: 8px 0;">
+                    📎 Optional: Add files now
+                </summary>
+                <div style="margin-top: 10px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                    <input type="file" id="newFolderFiles" multiple style="margin-bottom: 10px;">
+                    <p style="font-size: 0.75rem; color: rgba(255,255,255,0.4);">Select files to upload after creating folder</p>
+                </div>
+            </details>
+
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeNewFolderModal()">Cancel</button>
+                <button class="modal-btn confirm-green" onclick="createFolderWithOptionalFiles()">Create Folder</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rename Folder Modal -->
+    <div class="modal" id="renameFolderModal">
+        <div class="modal-content">
+            <div class="modal-icon">✏️</div>
+            <h3>Rename Folder</h3>
+            <p>Enter new name:</p>
+            <input type="hidden" id="renameFolderType">
+            <input type="hidden" id="renameFolderId">
+            <input type="text" id="renameFolderName" placeholder="New folder name...">
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeRenameFolderModal()">Cancel</button>
+                <button class="modal-btn confirm-green" onclick="renameFolder()">Rename</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Folder Modal -->
+    <div class="modal" id="deleteFolderModal">
+        <div class="modal-content">
+            <div class="modal-icon">⚠️</div>
+            <h3>Delete Folder?</h3>
+            <p>This will delete the folder and ALL files inside it. This action cannot be undone.</p>
+            <input type="hidden" id="deleteFolderType">
+            <input type="hidden" id="deleteFolderId">
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeDeleteFolderModal()">Cancel</button>
+                <button class="modal-btn confirm" onclick="confirmDeleteFolder()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete All Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-icon">⚠️</div>
+            <h3>Delete All Files?</h3>
+            <p>This will delete ALL files in this folder. This action cannot be undone.</p>
+            <input type="hidden" id="deleteAllType">
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
+                <button class="modal-btn confirm" onclick="doDeleteAll()">Delete All</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DEFAULT_ADMIN_ID = 'admin';
+        const DEFAULT_ADMIN_PASS = 'MONSFAMS';
+        let serverUrl = localStorage.getItem('serverUrl') || '';
+        let sessionToken = localStorage.getItem('sessionToken') || '';
+        let adminId = '';
+        let adminPass = '';
+
+        // Security: Prevent localStorage tampering
+        function secureGet(key, defaultVal = '') {
+            try {
+                const val = localStorage.getItem(key);
+                return val || defaultVal;
+            } catch {
+                return defaultVal;
+            }
+        }
+
+        function secureSet(key, val) {
+            try {
+                localStorage.setItem(key, val);
+            } catch {}
+        }
+
+        function secureRemove(key) {
+            try {
+                localStorage.removeItem(key);
+            } catch {}
+        }
+
+        // Check for ?server= param for auto-detect
+        const urlParams = new URLSearchParams(window.location.search);
+        const serverParam = urlParams.get('server');
+        if (serverParam && !serverUrl) {
+            serverUrl = serverParam;
+            secureSet('serverUrl', serverUrl);
+        }
+        if (serverUrl) {
+            document.getElementById('serverUrl').value = serverUrl;
+        }
+
+        let selectedFiles = { free: [], premium: [] };
+        let deleteTarget = null;
+        let currentTab = 'free';
+        let currentFolder = { free: 'all', premium: 'all' };
+        let folders = { free: [], premium: [] };
+        let allFiles = { free: [], premium: [] };
+        let selectedItems = new Set();
+        let selectedFolders = new Set();
+        let loginAttempts = 0;
+
+        // Check if already logged in with valid session
+        async function checkExistingSession() {
+            const stored = secureGet('isAdmin');
+            const token = secureGet('sessionToken');
+
+            if (stored === 'true' && token && serverUrl) {
+                try {
+                    const res = await fetch(`${serverUrl}/api/session`, {
+                        headers: { 'x-session-token': token }
+                    });
+                    const data = await res.json();
+
+                    if (data.valid) {
+                        sessionToken = token;
+                        document.getElementById('loginBox').style.display = 'none';
+                        document.getElementById('dashboard').classList.add('active');
+                        autoConnectServer();
+                        return true;
+                    }
+                } catch {}
+            }
+
+            // Invalid session - clear everything
+            secureRemove('isAdmin');
+            secureRemove('sessionToken');
+            sessionToken = '';
+            return false;
+        }
+
+        // Run session check on load
+        checkExistingSession();
+
+        async function login() {
+            const id = document.getElementById('adminId').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!id || !password) {
+                document.getElementById('loginError').textContent = 'Please enter both ID and Password';
+                document.getElementById('loginError').classList.add('show');
+                return;
+            }
+
+            // Rate limit on client side
+            loginAttempts++;
+            if (loginAttempts > 10) {
+                document.getElementById('loginError').textContent = 'Too many attempts. Please refresh the page.';
+                document.getElementById('loginError').classList.add('show');
+                return;
+            }
+
+            if (!serverUrl) {
+                document.getElementById('loginError').textContent = 'Server not configured.';
+                document.getElementById('loginError').classList.add('show');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${serverUrl}/api/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, password })
+                });
+
+                if (res.status === 429) {
+                    const data = await res.json();
+                    document.getElementById('loginError').textContent = data.error;
+                    document.getElementById('loginError').classList.add('show');
+                    return;
+                }
+
+                const data = await res.json();
+
+                if (data.valid && data.token) {
+                    // Success
+                    sessionToken = data.token;
+                    adminId = id;
+                    adminPass = password;
+                    secureSet('sessionToken', sessionToken);
+                    secureSet('isAdmin', 'true');
+                    loginAttempts = 0;
+
+                    document.getElementById('loginBox').style.display = 'none';
+                    document.getElementById('dashboard').classList.add('active');
+                    autoConnectServer();
+                } else {
+                    document.getElementById('loginError').textContent = data.error || 'Incorrect ID or Password';
+                    if (data.attemptsRemaining !== undefined) {
+                        document.getElementById('loginError').textContent += ` (${data.attemptsRemaining} attempts left)`;
+                    }
+                    document.getElementById('loginError').classList.add('show');
+                    document.getElementById('password').value = '';
+                    document.getElementById('password').focus();
+                }
+            } catch (err) {
+                document.getElementById('loginError').textContent = 'Cannot connect to server.';
+                document.getElementById('loginError').classList.add('show');
+            }
+        }
+
+        async function logout() {
+            // Try to invalidate session on server
+            try {
+                await fetch(`${serverUrl}/api/logout`, {
+                    method: 'POST',
+                    headers: { 'x-session-token': sessionToken }
+                });
+            } catch {}
+
+            secureRemove('isAdmin');
+            secureRemove('sessionToken');
+            sessionToken = '';
+            adminId = '';
+            adminPass = '';
+            loginAttempts = 0;
+            location.reload();
+        }
+
+        // Session token helper
+        function getAuthHeaders() {
+            return {
+                'x-session-token': sessionToken,
+                'x-admin-id': adminId || DEFAULT_ADMIN_ID,
+                'x-admin-password': adminPass || DEFAULT_ADMIN_PASS
+            };
+        }
+
+        async function autoConnectServer() {
+            if (!serverUrl) {
+                serverUrl = 'http://localhost:3000';
+            }
+
+            try {
+                serverUrl = serverUrl.replace(/\/+$/, '');
+                secureSet('serverUrl', serverUrl);
+                document.getElementById('serverUrl').value = serverUrl;
+
+                // Verify session is still valid
+                if (sessionToken) {
+                    const sessionRes = await fetch(`${serverUrl}/api/session`, {
+                        headers: { 'x-session-token': sessionToken }
+                    });
+                    if (sessionRes.ok) {
+                        const sessionData = await sessionRes.json();
+                        if (!sessionData.valid) {
+                            // Session expired
+                            secureRemove('isAdmin');
+                            secureRemove('sessionToken');
+                            sessionToken = '';
+                            document.getElementById('dashboard').classList.remove('active');
+                            document.getElementById('loginBox').style.display = 'block';
+                            document.getElementById('loginError').textContent = 'Session expired. Please login again.';
+                            document.getElementById('loginError').classList.add('show');
+                            return;
+                        }
+                    }
+                }
+
+                // Connect to server
+                await connectServer();
+            } catch (err) {
+                document.getElementById('serverText').textContent = 'Server: Connection failed';
+                toast('Cannot connect to server', true);
+            }
+        }
+
+        async function connectServer() {
+            const url = document.getElementById('serverUrl').value.trim() || 'http://localhost:3000';
+            serverUrl = url;
+            localStorage.setItem('serverUrl', serverUrl);
+            document.getElementById('serverUrl').value = serverUrl;
+
+            try {
+                // Load folders first
+                await Promise.all([
+                    loadFolders('free'),
+                    loadFolders('premium')
+                ]);
+
+                // Then load files
+                await Promise.all([
+                    loadFiles('free'),
+                    loadFiles('premium')
+                ]);
+
+                // Load premium password
+                await loadPremiumPassword();
+
+                // Update UI
+                document.getElementById('serverStatus').classList.add('connected');
+                const totalDownloads = (allFiles.free || []).reduce((sum, f) => sum + (f.downloads || 0), 0) +
+                                       (allFiles.premium || []).reduce((sum, f) => sum + (f.downloads || 0), 0);
+                document.getElementById('serverText').textContent = `Server: ${serverUrl} | 📥 ${totalDownloads} Downloads`;
+                updateTabCounts();
+                toast('Connected to server!');
+            } catch (err) {
+                document.getElementById('serverStatus').classList.remove('connected');
+                document.getElementById('serverText').textContent = 'Server: Connection failed';
+                toast('Cannot connect to server', true);
+            }
+        }
+
+        // ============ FOLDER FUNCTIONS ============
+
+        async function loadFolders(type) {
+            try {
+                const res = await fetch(`${serverUrl}/api/folders/${type}`);
+                const folderList = await res.json();
+                folders[type] = folderList;
+
+                // Update folders bar
+                renderFoldersBar(type);
+
+                // Update upload folder dropdown
+                updateFolderDropdown(type);
+            } catch (err) {
+                console.error('Failed to load folders:', err);
+            }
+        }
+
+        // Legacy function - now uses renderFoldersList instead
+        function renderFoldersBar(type) {
+            renderFoldersList(type);
+            const folderList = folders[type] || [];
+            document.getElementById(`${type}Folders`).textContent = folderList.filter(f => !f.isDefault).length;
+        }
+
+        function renderFoldersList(type) {
+            const list = document.getElementById(`${type}FoldersList`);
+            if (!list) return;
+
+            const folderList = folders[type] || [];
+            const green = type === 'free' ? 'green' : '';
+
+            const folderCards = folderList
+                .filter(f => !f.isDefault)
+                .sort((a, b) => (a.fullPath || a.name).localeCompare(b.fullPath || b.name))
+                .map(f => {
+                    const isSelected = selectedFolders.has(type + '-' + f.id);
+                    const parentPath = f.parentId ? folders[type].find(p => p.id === f.parentId)?.name || '' : '';
+
+                    return `<div class="folder-card ${green} ${isSelected ? 'selected' : ''}" data-type="${type}" data-id="${f.id}" onclick="toggleFolderSelection('${type}', '${f.id}')"><div class="folder-card-checkbox"><input type="checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleFolderSelection('${type}', '${f.id}')"></div><div class="folder-card-icon">📂</div><div class="folder-card-name">${e(f.name)}</div>${parentPath ? `<div class="folder-card-path">📁 ${e(parentPath)}</div>` : ''}<div class="folder-card-count"><span>${f.fileCount || 0}</span> files</div><div class="folder-card-actions" onclick="event.stopPropagation()"><button class="folder-card-btn subfolder" onclick="openNewFolderModal('${type}', '${f.id}')" title="Create subfolder">+</button><button class="folder-card-btn edit" onclick="openRenameFolderModal('${type}', '${f.id}', '${e(f.name)}')" title="Rename">✏️</button><button class="folder-card-btn delete" onclick="openDeleteFolderModal('${type}', '${f.id}')" title="Delete">🗑️</button></div></div>`;
+                }).join('');
+
+            list.innerHTML = folderCards || '<div class="folder-card-empty">No folders yet. Click "+ New Folder" to create one.</div>';
+            updateFolderSelectionUI(type);
+        }
+
+        function toggleFolderSelection(type, folderId) {
+            const key = type + '-' + folderId;
+            if (selectedFolders.has(key)) {
+                selectedFolders.delete(key);
+            } else {
+                selectedFolders.add(key);
+            }
+            const card = document.querySelector(`.folder-card[data-type="${type}"][data-id="${folderId}"]`);
+            if (card) {
+                card.classList.toggle('selected', selectedFolders.has(key));
+                card.querySelector('input[type="checkbox"]').checked = selectedFolders.has(key);
+            }
+            updateFolderSelectionUI(type);
+        }
+
+        function updateFolderSelectionUI(type) {
+            const count = Array.from(selectedFolders).filter(k => k.startsWith(type + '-')).length;
+            const btn = document.getElementById(`${type}DeleteSelectedFoldersBtn`);
+            const folderCount = folders[type]?.filter(f => !f.isDefault).length || 0;
+            if (folderCount === 0) {
+                btn.style.display = 'none';
+            } else {
+                btn.style.display = count > 0 ? 'inline-flex' : 'none';
+                btn.textContent = `🗑️ Delete Selected (${count})`;
+            }
+        }
+
+        async function confirmDeleteSelectedFolders(type) {
+            const selected = Array.from(selectedFolders).filter(k => k.startsWith(type + '-'));
+            if (selected.length === 0) return;
+            const folderNames = selected.map(k => {
+                const id = k.split('-').slice(1).join('-');
+                return folders[type]?.find(f => f.id === id)?.name || id;
+            });
+            if (!confirm(`Delete ${selected.length} folder(s)?
+
+${folderNames.join('
+')}
+
+This will delete all files inside these folders!`)) return;
+            let deleted = 0;
+            let errors = 0;
+            for (const key of selected) {
+                const folderId = key.split('-').slice(1).join('-');
+                try {
+                    const res = await fetch(`${serverUrl}/api/folders/${type}/${folderId}`, {
+                        method: 'DELETE',
+                        headers: getAuthHeaders()
+                    });
+                    if (res.status === 401) { logout(); return; }
+                    if (res.ok) deleted++;
+                    else errors++;
+                } catch (err) {
+                    errors++;
+                }
+            }
+            selectedFolders.clear();
+            toast(`${deleted} folder(s) deleted!`);
+            await loadFolders(type);
+            await loadFiles(type);
+        }
+
+        function updateFolderDropdown(type) {
+            const select = document.getElementById(`${type}UploadFolder`);
+            const folderList = folders[type] || [];
+
+            // Build options with hierarchy
+            const buildOptions = (parentId = null, depth = 0) => {
+                const indent = '  '.repeat(depth);
+                return folderList
+                    .filter(f => (f.parentId || null) === parentId && f.id !== 'all')
+                    .map(f => {
+                        const selected = currentFolder[type] === f.id ? 'selected' : '';
+                        return `<option value="${f.id}" ${selected}>${indent}${f.fullPath || f.name}</option>` +
+                               (buildOptions(f.id, depth + 1) || '');
+                    }).join('');
+            };
+
+            select.innerHTML = `
+                <option value="all">All Files</option>
+                ${buildOptions()}
+            `;
+        }
+
+        function selectFolder(type, folderId) {
+            currentFolder[type] = folderId;
+            renderFoldersBar(type);
+
+            // Update current folder display
+            const folder = folderId === 'all' ? null : folders[type]?.find(f => f.id === folderId);
+            const folderPath = folder?.fullPath || '';
+            document.getElementById(`${type}CurrentFolder`).textContent = folderPath ? ` - ${folderPath}` : '';
+
+            // Update dropdown
+            document.getElementById(`${type}UploadFolder`).value = folderId;
+
+            // Filter and render files
+            renderFiles(type);
+        }
+
+        function openNewFolderModal(type, parentId = null) {
+            document.getElementById('newFolderType').value = type;
+            document.getElementById('newFolderParentId').value = parentId || '';
+            document.getElementById('newFolderName').value = '';
+
+            // Update parent name display
+            const parentName = parentId ? folders[type]?.find(f => f.id === parentId)?.fullPath || 'Unknown' : 'Root (All Files)';
+            document.getElementById('newFolderParentName').textContent = parentName;
+
+            // Populate parent dropdown
+            const select = document.getElementById('newFolderParentSelect');
+            const allFolders = folders[type] || [];
+
+            // Build hierarchy options
+            let options = '<option value="">Root (All Files)</option>';
+            const addOptions = (parentId, depth = 0) => {
+                const indent = '  '.repeat(depth);
+                for (const f of allFolders) {
+                    if (f.id !== 'all' && (f.parentId || null) === parentId) {
+                        options += `<option value="${f.id}">${indent}${f.name}</option>`;
+                        addOptions(f.id, depth + 1);
+                    }
+                }
+            };
+            addOptions(null);
+
+            select.innerHTML = options;
+            select.value = parentId || '';
+
+            document.getElementById('newFolderModal').classList.add('active');
+            document.getElementById('newFolderName').focus();
+        }
+
+        function updateNewFolderParent() {
+            const parentId = document.getElementById('newFolderParentSelect').value;
+            document.getElementById('newFolderParentId').value = parentId;
+        }
+
+        function closeNewFolderModal() {
+            document.getElementById('newFolderModal').classList.remove('active');
+            document.getElementById('newFolderName').value = '';
+            document.getElementById('newFolderFiles').value = '';
+            document.getElementById('newFolderParentSelect').value = '';
+            document.getElementById('newFolderParentId').value = '';
+        }
+
+        async function createFolder() {
+            const type = document.getElementById('newFolderType').value;
+            const name = document.getElementById('newFolderName').value.trim();
+            const parentId = document.getElementById('newFolderParentId').value || null;
+
+            if (!name) {
+                toast('Please enter a folder name', true);
+                return;
+            }
+
+            try {
+                const res = await fetch(`${serverUrl}/api/folders/${type}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAuthHeaders()
+                    },
+                    body: JSON.stringify({ name, parentId })
+                });
+
+                if (res.status === 401) { logout(); return; }
+
+                if (res.ok) {
+                    toast('Folder created!');
+                    closeNewFolderModal();
+                    await loadFolders(type);
+                    await loadFiles(type);
+                } else {
+                    const data = await res.json();
+                    toast(data.error || 'Failed to create folder', true);
+                }
+            } catch (err) {
+                toast('Failed to create folder', true);
+            }
+        }
+
+        function openRenameFolderModal(type, folderId, currentName) {
+            document.getElementById('renameFolderType').value = type;
+            document.getElementById('renameFolderId').value = folderId;
+            document.getElementById('renameFolderName').value = currentName;
+            document.getElementById('renameFolderModal').classList.add('active');
+            document.getElementById('renameFolderName').focus();
+        }
+
+        function closeRenameFolderModal() {
+            document.getElementById('renameFolderModal').classList.remove('active');
+        }
+
+        async function renameFolder() {
+            const type = document.getElementById('renameFolderType').value;
+            const folderId = document.getElementById('renameFolderId').value;
+            const name = document.getElementById('renameFolderName').value.trim();
+
+            if (!name) {
+                toast('Please enter a folder name', true);
+                return;
+            }
+
+            try {
+                const res = await fetch(`${serverUrl}/api/folders/${type}/${folderId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAuthHeaders()
+                    },
+                    body: JSON.stringify({ name })
+                });
+
+                if (res.status === 401) { logout(); return; }
+
+                if (res.ok) {
+                    toast('Folder renamed!');
+                    closeRenameFolderModal();
+                    await loadFolders(type);
+                } else {
+                    const data = await res.json();
+                    toast(data.error || 'Failed to rename folder', true);
+                }
+            } catch (err) {
+                toast('Failed to rename folder', true);
+            }
+        }
+
+        async function confirmDeleteFolder() {
+            const type = document.getElementById('deleteFolderType').value;
+            const folderId = document.getElementById('deleteFolderId').value;
+
+            try {
+                const res = await fetch(`${serverUrl}/api/folders/${type}/${folderId}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+
+                if (res.status === 401) { logout(); return; }
+
+                if (res.ok) {
+                    toast('Folder deleted!');
+                    closeDeleteFolderModal();
+                    if (currentFolder[type] === folderId) {
+                        selectFolder(type, 'all');
+                    }
+                    await loadFolders(type);
+                    await loadFiles(type);
+                } else {
+                    const data = await res.json();
+                    toast(data.error || 'Failed to delete folder', true);
+                }
+            } catch (err) {
+                toast('Failed to delete folder', true);
+            }
+        }
+
+        // ============ END FOLDER FUNCTIONS ============
+
+        async function loadPremiumPassword() {
+            if (!serverUrl) return;
+            try {
+                const res = await fetch(`${serverUrl}/api/premium-password`, {
+                    headers: getAuthHeaders()
+                });
+                if (res.status === 401) {
+                    logout();
+                    return;
+                }
+                const data = await res.json();
+                document.getElementById('currentPremiumPassword').textContent = data.password;
+            } catch (err) {
+                document.getElementById('currentPremiumPassword').textContent = 'Error loading';
+            }
+        }
+
+        async function changePremiumPassword() {
+            if (!serverUrl) {
+                toast('Connect to server first!', true);
+                return;
+            }
+
+            const newPassword = document.getElementById('newPremiumPassword').value.trim();
+
+            if (newPassword.length < 3) {
+                toast('Password must be at least 3 characters', true);
+                return;
+            }
+
+            try {
+                const res = await fetch(`${serverUrl}/api/premium-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAuthHeaders()
+                    },
+                    body: JSON.stringify({ newPassword })
+                });
+
+                if (res.status === 401) {
+                    logout();
+                    return;
+                }
+
+                if (res.ok) {
+                    toast('Premium password changed!');
+                    document.getElementById('currentPremiumPassword').textContent = newPassword;
+                    document.getElementById('newPremiumPassword').value = '';
+                } else {
+                    throw new Error('Failed');
+                }
+            } catch (err) {
+                toast('Failed to change password', true);
+            }
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach((t, i) => {
+                t.classList.toggle('active', (tab === 'free' && i === 0) || (tab === 'premium' && i === 1));
+            });
+            document.getElementById('freeSection').style.display = tab === 'free' ? 'block' : 'none';
+            document.getElementById('premiumSection').style.display = tab === 'premium' ? 'block' : 'none';
+            updateTabCounts();
+        }
+
+        function updateTabCounts() {
+            const freeCount = allFiles.free?.length || 0;
+            const premiumCount = allFiles.premium?.length || 0;
+            document.getElementById('freeTabCount').textContent = freeCount;
+            document.getElementById('premiumTabCount').textContent = premiumCount;
+        }
+
+        async function loadFiles(type) {
+            if (!serverUrl) return;
+
+            try {
+                const folderId = currentFolder[type];
+                let url = `${serverUrl}/api/files/${type}`;
+                if (folderId && folderId !== 'all') {
+                    url = `${serverUrl}/api/files/${type}/folder/${folderId}`;
+                }
+
+                const res = await fetch(url);
+                const files = await res.json();
+
+                allFiles[type] = files;
+                updateStats(type, files);
+                renderFiles(type);
+            } catch (err) {
+                console.error('Failed to load files:', err);
+            }
+        }
+
+        function updateStats(type, files) {
+            const count = files.length;
+            let size = 0;
+            let downloads = 0;
+            files.forEach(f => {
+                size += f.size || 0;
+                downloads += f.downloads || 0;
+            });
+
+            document.getElementById(type + 'Count').textContent = count;
+            document.getElementById(type + 'Size').textContent = fmt(size);
+            document.getElementById(type + 'Downloads').textContent = downloads;
+
+            // Update folder counts
+            renderFoldersBar(type);
+        }
+
+        function renderFiles(type) {
+            const grid = document.getElementById(type + 'FilesGrid');
+            const folderId = currentFolder[type];
+            let files = allFiles[type] || [];
+
+            // Filter by folder if not "all"
+            if (folderId && folderId !== 'all') {
+                files = files.filter(f => f.folderPath === folderId || f.folderId === folderId);
+            }
+
+            if (files.length === 0) {
+                grid.innerHTML = '<div class="empty-state">No files in this folder. Upload above!</div>';
+                selectedItems.clear();
+                updateSelectionUI(type);
+                return;
+            }
+
+            const green = type === 'free' ? 'green' : '';
+            grid.innerHTML = files.map((f, i) => `
+                <div class="file-card ${green} ${selectedItems.has(type + '-' + i) ? 'selected' : ''}" data-type="${type}" data-index="${i}">
+                    <div class="file-card-checkbox">
+                        <input type="checkbox" ${selectedItems.has(type + '-' + i) ? 'checked' : ''}
+                               onchange="toggleFileSelection('${type}', ${i})">
+                    </div>
+                    <div class="file-card-icon ${green}">📦</div>
+                    <div class="file-card-name">${e(f.name)}</div>
+                    <div class="file-card-size">${fmt(f.size)}</div>
+                    <div class="file-card-date">📥 ${f.downloads || 0} downloads</div>
+                    <div class="file-card-date">${fmtDate(f.createdAt)}</div>
+                    ${f.folderPath && f.folderPath !== 'all' ? `<div class="file-card-folder"><span class="folder-badge">📂 ${e(f.folderPath)}</span></div>` : ''}
+                    <div class="file-card-actions">
+                        <a href="${serverUrl}${f.downloadUrl}" class="file-card-btn download ${green}" target="_blank">⬇️ Download</a>
+                        <button class="file-card-btn delete" onclick="deleteFile('${type}', '${f.folderPath || 'all'}', '${e(f.filename)}')">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('');
+
+            updateSelectionUI(type);
+        }
+
+        function toggleFileSelection(type, index) {
+            const key = type + '-' + index;
+            if (selectedItems.has(key)) {
+                selectedItems.delete(key);
+            } else {
+                selectedItems.add(key);
+            }
+            // Update card styling
+            const card = document.querySelector(`.file-card[data-type="${type}"][data-index="${index}"]`);
+            if (card) {
+                card.classList.toggle('selected', selectedItems.has(key));
+            }
+            updateSelectionUI(type);
+        }
+
+        function toggleSelectAll(type) {
+            let files = allFiles[type] || [];
+            const folderId = currentFolder[type];
+            if (folderId && folderId !== 'all') {
+                files = files.filter(f => f.folderPath === folderId || f.folderId === folderId);
+            }
+
+            if (selectedItems.size === files.length) {
+                // Deselect all
+                for (let i = 0; i < files.length; i++) {
+                    selectedItems.delete(type + '-' + i);
+                }
+            } else {
+                // Select all
+                for (let i = 0; i < files.length; i++) {
+                    selectedItems.add(type + '-' + i);
+                }
+            }
+            renderFiles(type);
+        }
+
+        function updateSelectionUI(type) {
+            let files = allFiles[type] || [];
+            const folderId = currentFolder[type];
+            if (folderId && folderId !== 'all') {
+                files = files.filter(f => f.folderPath === folderId || f.folderId === folderId);
+            }
+
+            const count = selectedItems.size;
+            const selectBar = document.getElementById(type + 'FilesSelectionBar');
+            const selectAllBtn = document.getElementById(type + 'SelectAllBtn');
+            const deleteBtn = document.getElementById(type + 'DeleteSelectedBtn');
+            const countEl = document.getElementById(type + 'SelectedCount');
+
+            if (files.length === 0) {
+                selectBar.style.display = 'none';
+                return;
+            }
+
+            selectBar.style.display = count > 0 ? 'flex' : 'none';
+            countEl.textContent = count;
+            deleteBtn.style.display = count > 0 ? 'inline-flex' : 'none';
+            selectAllBtn.textContent = count === files.length ? 'Deselect All' : 'Select All';
+        }
+
+        function showDeleteSelectedModal(type) {
+            const count = selectedItems.size;
+            if (count === 0) return;
+            document.getElementById('deleteSelectedCountText').textContent =
+                `Are you sure you want to delete ${count} selected file(s)?`;
+            document.getElementById('deleteSelectedType').value = type;
+            document.getElementById('deleteSelectedModal').classList.add('active');
+        }
+
+        function closeDeleteSelectedModal() {
+            document.getElementById('deleteSelectedModal').classList.remove('active');
+        }
+
+        async function doDeleteSelected() {
+            const type = document.getElementById('deleteSelectedType').value;
+            let files = allFiles[type] || [];
+            const folderId = currentFolder[type];
+            if (folderId && folderId !== 'all') {
+                files = files.filter(f => f.folderPath === folderId || f.folderId === folderId);
+            }
+
+            let deleted = 0;
+            let errors = 0;
+
+            for (const key of selectedItems) {
+                const [t, idx] = key.split('-');
+                if (t !== type) continue;
+                const index = parseInt(idx);
+                const file = files[index];
+                if (!file) continue;
+
+                try {
+                    const res = await fetch(`${serverUrl}/api/files/${type}/${file.folderPath || 'all'}/${encodeURIComponent(file.filename)}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'x-admin-id': adminId || DEFAULT_ADMIN_ID,
+                            'x-admin-password': adminPass || DEFAULT_ADMIN_PASS
+                        }
+                    });
+                    if (res.ok) deleted++;
+                    else errors++;
+                } catch (err) {
+                    errors++;
+                }
+            }
+
+            selectedItems.clear();
+            closeDeleteSelectedModal();
+            toast(`${deleted} file(s) deleted!`);
+            await loadFiles(type);
+            await loadFolders(type);
+        }
+
+        function confirmDeleteAll(type) {
+            document.getElementById('deleteAllType').value = type;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+        }
+
+        async function doDeleteAll() {
+            const type = document.getElementById('deleteAllType').value;
+            closeModal();
+
+            try {
+                const folderId = currentFolder[type];
+                let url = `${serverUrl}/api/files/${type}`;
+                if (folderId && folderId !== 'all') {
+                    url += `?folder=${folderId}`;
+                }
+
+                const res = await fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'x-admin-id': adminId || DEFAULT_ADMIN_ID,
+                        'x-admin-password': adminPass || DEFAULT_ADMIN_PASS
+                    }
+                });
+
+                if (res.ok) {
+                    toast('All files deleted!');
+                    await loadFiles(type);
+                    await loadFolders(type);
+                }
+            } catch (err) {
+                toast('Failed to delete files', true);
+            }
+        }
+
+        async function uploadFiles(type) {
+            const input = document.getElementById(type + 'FileInput');
+            const files = input.files;
+            if (files.length === 0 || !serverUrl) return;
+
+            const folderId = document.getElementById(type + 'UploadFolder').value;
+
+            const progressDiv = document.getElementById(type + 'Progress');
+            const progressBar = document.getElementById(type + 'ProgressBar');
+            const progressText = document.getElementById(type + 'ProgressText');
+
+            progressDiv.classList.add('show');
+            progressText.textContent = `Uploading 0/${files.length}...`;
+
+            let uploaded = 0;
+            let failed = 0;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const formData = new FormData();
+                const baseName = document.getElementById(type + 'FileName').value.trim();
+                formData.append('file', file);
+                formData.append('name', baseName || file.name);
+                formData.append('folderId', folderId);
+
+                try {
+                    const res = await fetch(`${serverUrl}/api/upload/${type}`, {
+                        method: 'POST',
+                        headers: getAuthHeaders(),
+                        body: formData
+                    });
+
+                    if (res.status === 401) { logout(); return; }
+                    if (res.ok) {
+                        uploaded++;
+                    } else {
+                        failed++;
+                    }
+                } catch (err) {
+                    failed++;
+                }
+
+                const percent = ((i + 1) / files.length) * 100;
+                progressBar.style.width = percent + '%';
+                progressText.textContent = `Uploading ${i + 1}/${files.length}...`;
+            }
+
+            progressText.textContent = `Done! ${uploaded} uploaded${failed > 0 ? `, ${failed} failed` : ''}`;
+            setTimeout(() => {
+                progressDiv.classList.remove('show');
+                progressBar.style.width = '0%';
+            }, 2000);
+
+            clearFile(type);
+            document.getElementById(type + 'FileName').value = '';
+            loadFiles(type);
+
+            toast(`${uploaded} file(s) uploaded!`);
+        }
+
+        async function deleteFile(type, folderId, filename) {
+            if (!confirm('Delete this file?')) return;
+
+            try {
+                const res = await fetch(`${serverUrl}/api/files/${type}/${folderId}/${encodeURIComponent(filename)}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+
+                if (res.status === 401) { logout(); return; }
+                if (res.ok) {
+                    toast('File deleted!');
+                    await loadFiles(type);
+                    await loadFolders(type);
+                }
+            } catch (err) {
+                toast('Failed to delete', true);
+            }
+        }
+
+        function deleteAll(type) {
+            const folderId = currentFolder[type];
+            const folderName = folderId === 'all' ? 'all files' : `folder "${folders[type].find(f => f.id === folderId)?.name || folderId}"`;
+            if (!confirm(`Delete ${folderName}? This cannot be undone.`)) return;
+
+            confirmDeleteAllFolder(type, folderId);
+        }
+
+        function closeModal() {
+            deleteTarget = null;
+            document.getElementById('deleteModal').classList.remove('active');
+        }
+
+        async function confirmDeleteAllFolder(type, folderId) {
+            if (!serverUrl) return;
+
+            try {
+                let url = `${serverUrl}/api/files/${type}`;
+                if (folderId && folderId !== 'all') {
+                    url += `?folder=${folderId}`;
+                }
+
+                const res = await fetch(url, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+
+                if (res.status === 401) { logout(); return; }
+                if (res.ok) {
+                    toast('Files deleted!');
+                    await loadFiles(type);
+                    await loadFolders(type);
+                }
+            } catch (err) {
+                toast('Failed to delete', true);
+            }
+        }
+
+        function clearFile(type) {
+            selectedFiles[type] = [];
+            document.getElementById(type + 'FileSelected').classList.remove('show');
+            document.getElementById(type + 'UploadBtn').disabled = true;
+            document.getElementById(type === 'free' ? 'fileInput' : 'premiumFileInput').value = '';
+        }
+
+        // Handle folder dropdown change
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.upload-folder-select').forEach(select => {
+                select.addEventListener('change', function() {
+                    const type = this.id.replace('UploadFolder', '');
+                    const folderId = this.value;
+                    selectFolder(type, folderId);
+                });
+            });
+        });
+
+        function handleFiles(type, files) {
+            if (files.length === 0) return;
+
+            const totalSize = Array.from(files).reduce((sum, f) => sum + f.size, 0);
+
+            selectedFiles[type] = Array.from(files);
+            if (files.length === 1) {
+                document.getElementById(type + 'SelectedName').textContent = files[0].name;
+                document.getElementById(type + 'SelectedSize').textContent = fmt(files[0].size);
+            } else {
+                document.getElementById(type + 'SelectedName').textContent = files.length + ' files selected';
+                document.getElementById(type + 'SelectedSize').textContent = fmt(totalSize);
+            }
+            document.getElementById(type + 'FileSelected').classList.add('show');
+            document.getElementById(type + 'UploadBtn').disabled = false;
+        }
+
+        // Event listeners
+        document.getElementById('fileInput').addEventListener('change', e => handleFiles('free', e.target.files));
+        document.getElementById('premiumFileInput').addEventListener('change', e => handleFiles('premium', e.target.files));
+        document.getElementById('password').addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
+        document.getElementById('adminId').addEventListener('keypress', e => { if (e.key === 'Enter') document.getElementById('password').focus(); });
+
+        // Utility functions
+        function fmt(b) { if (!b) return '0 B'; const s=['B','KB','MB','GB']; const i=Math.floor(Math.log(b)/Math.log(1024)); return Math.round(b/Math.pow(1024,i)*100)/100+' '+s[i]; }
+        function fmtDate(d) { if (!d) return '-'; return new Date(d).toLocaleDateString('en', {month:'short',day:'numeric',year:'numeric'}); }
+        function e(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+        function toast(m, err=false) { const t=document.createElement('div'); t.className='toast '+(err?'error':'success'); t.textContent=m; document.body.appendChild(t); setTimeout(()=>t.remove(), 3000); }
+    </script>
+</body>
+</html>

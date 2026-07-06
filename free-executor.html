@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MONSFAMS - Free</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; min-height: 100vh; background: #1a1a1a; display: flex; flex-direction: column; align-items: center; padding: 20px; color: white; }
+        .container { max-width: 700px; width: 100%; }
+        .back { color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.9rem; display: inline-block; margin-bottom: 15px; }
+        .back:hover { color: rgba(255,255,255,0.8); }
+        .header { text-align: center; margin-bottom: 30px; }
+        .title { font-size: 2.5rem; font-weight: 800; letter-spacing: 4px; background: linear-gradient(90deg, #4CAF50, #81C784); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; }
+        .subtitle { color: rgba(255,255,255,0.4); font-size: 0.9rem; }
+
+        /* Server Setup */
+        .server-setup { background: rgba(255,255,255,0.05); border: 1px solid rgba(76,175,80,0.3); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+        .server-setup h3 { font-size: 1rem; margin-bottom: 10px; color: rgba(255,255,255,0.8); }
+        .server-setup p { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-bottom: 12px; }
+        .server-row { display: flex; gap: 10px; }
+        .server-row input { flex: 1; padding: 12px 16px; font-size: 0.95rem; color: white; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; outline: none; }
+        .server-row input:focus { border-color: #4CAF50; }
+        .server-row button { padding: 12px 20px; font-size: 0.9rem; font-weight: 600; color: white; background: linear-gradient(135deg, #4CAF50, #45a049); border: none; border-radius: 10px; cursor: pointer; }
+
+        /* Selection Bar */
+        .selection-bar { background: rgba(255,255,255,0.08); border: 1px solid rgba(76,175,80,0.3); border-radius: 16px; padding: 15px 20px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+        .selection-info { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
+        .selection-info span { color: #4CAF50; font-weight: 600; }
+        .select-all-btn { padding: 8px 16px; font-size: 0.85rem; color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; cursor: pointer; transition: all 0.2s; }
+        .select-all-btn:hover { background: rgba(255,255,255,0.15); color: white; }
+        .selection-actions { display: flex; gap: 10px; }
+        .download-selected-btn { padding: 10px 22px; font-size: 0.9rem; font-weight: 600; color: white; background: linear-gradient(135deg, #4CAF50, #45a049); border: none; border-radius: 25px; cursor: pointer; transition: all 0.2s; display: none; }
+        .download-selected-btn.show { display: inline-flex; align-items: center; gap: 8px; }
+        .download-selected-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(76,175,80,0.4); }
+        .download-selected-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* Files Section */
+        .files-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .files-header h3 { font-size: 0.9rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 2px; }
+        .file-count { font-size: 0.85rem; color: rgba(255,255,255,0.4); }
+
+        /* File Item */
+        .file-item { display: flex; align-items: center; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; margin-bottom: 10px; transition: all 0.2s; }
+        .file-item:hover { border-color: rgba(76,175,80,0.3); }
+        .file-item.selected { border-color: #4CAF50; background: rgba(76,175,80,0.1); }
+
+        .file-checkbox { margin-right: 15px; }
+        .file-checkbox input[type="checkbox"] { width: 20px; height: 20px; accent-color: #4CAF50; cursor: pointer; }
+        .file-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #4CAF50, #45a049); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-right: 15px; flex-shrink: 0; }
+        .file-info { flex: 1; min-width: 0; }
+        .file-name { font-size: 0.95rem; font-weight: 500; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .file-meta { display: flex; gap: 15px; font-size: 0.8rem; color: rgba(255,255,255,0.4); }
+        .file-meta span { display: flex; align-items: center; gap: 4px; }
+        .file-actions { display: flex; gap: 8px; margin-left: 15px; flex-shrink: 0; }
+        .file-btn { padding: 8px 18px; font-size: 0.85rem; font-weight: 600; color: white; background: linear-gradient(135deg, #4CAF50, #45a049); border: none; border-radius: 20px; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+        .file-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(76,175,80,0.3); }
+        .file-btn.downloading { opacity: 0.7; pointer-events: none; }
+        .file-btn svg { width: 14px; height: 14px; }
+
+        /* Empty & Loading States */
+        .empty, .loading { color: rgba(255,255,255,0.3); padding: 60px 20px; text-align: center; }
+        .empty-icon, .loading-icon { font-size: 50px; margin-bottom: 15px; opacity: 0.5; }
+        .empty-text, .loading-text { font-size: 1rem; margin-bottom: 5px; }
+        .empty-hint { font-size: 0.85rem; color: rgba(255,255,255,0.2); }
+
+        /* Download Progress Modal */
+        .progress-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .progress-modal.active { opacity: 1; visibility: visible; }
+        .progress-content { background: linear-gradient(135deg, #2a2a2a, #333); border: 1px solid rgba(76,175,80,0.3); border-radius: 20px; padding: 30px; max-width: 400px; width: 90%; text-align: center; }
+        .progress-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; }
+        .progress-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 8px; font-size: 0.9rem; }
+        .progress-item.completed { color: #4CAF50; }
+        .progress-item.current { color: #81C784; }
+        .progress-item.error { color: #e94560; }
+        .progress-status { margin-top: 20px; }
+        .progress-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #4CAF50, #81C784); width: 0%; transition: width 0.3s; }
+        .progress-text { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
+        .progress-close { margin-top: 20px; padding: 10px 25px; font-size: 0.9rem; color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.1); border: none; border-radius: 20px; cursor: pointer; }
+
+        /* Toast */
+        .toast { position: fixed; top: 20px; right: 20px; padding: 14px 22px; border-radius: 12px; font-size: 0.9rem; animation: slide 0.3s; z-index: 2000; }
+        .toast.success { background: rgba(76,175,80,0.95); }
+        .toast.error { background: rgba(233,69,96,0.95); }
+        .toast.info { background: rgba(76,175,80,0.95); }
+        @keyframes slide { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        @media (max-width: 600px) {
+            .selection-bar { flex-direction: column; align-items: stretch; }
+            .selection-actions { justify-content: center; }
+            .file-item { flex-wrap: wrap; }
+            .file-checkbox { margin-bottom: 10px; }
+            .file-actions { margin-left: 0; margin-top: 10px; width: 100%; justify-content: flex-end; }
+            .file-meta { flex-wrap: wrap; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back">← Back to Home</a>
+
+        <div class="header">
+            <h1 class="title">FREE</h1>
+            <p class="subtitle">Free executor for everyone</p>
+        </div>
+
+        <!-- Server Setup -->
+        <div class="server-setup" id="serverSetup">
+            <h3>⚙️ Server Setup</h3>
+            <p>Enter server URL to load files:</p>
+            <div class="server-row">
+                <input type="text" id="serverUrlInput" placeholder="http://localhost:3000">
+                <button onclick="saveServerUrl()">Save</button>
+            </div>
+        </div>
+
+        <!-- Selection Bar -->
+        <div class="selection-bar" id="selectionBar" style="display: none;">
+            <div class="selection-info">
+                <span id="selectedCount">0</span> file(s) selected
+                <span id="selectedSize" style="color: rgba(255,255,255,0.5); font-size: 0.85rem;"></span>
+            </div>
+            <div class="selection-actions">
+                <button class="select-all-btn" id="selectAllBtn" onclick="toggleSelectAll()">Select All</button>
+                <button class="select-all-btn" onclick="clearSelection()">Clear</button>
+                <button class="download-selected-btn" id="downloadSelectedBtn" onclick="downloadSelected()">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Download Selected
+                </button>
+            </div>
+        </div>
+
+        <!-- Files Section -->
+        <div class="files-header" id="filesHeader" style="display: none;">
+            <h3>📁 Free Files</h3>
+            <span class="file-count" id="fileCount">0 files</span>
+        </div>
+        <div id="filesList">
+            <div class="loading">
+                <div class="loading-icon">⏳</div>
+                <div class="loading-text">Loading files...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Progress Modal -->
+    <div class="progress-modal" id="progressModal">
+        <div class="progress-content">
+            <h3 class="progress-title" id="progressTitle">Downloading Files...</h3>
+            <div id="progressList"></div>
+            <div class="progress-status">
+                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                <p class="progress-text" id="progressText">Preparing...</p>
+            </div>
+            <button class="progress-close" id="progressClose" onclick="closeProgressModal()" style="display: none;">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const SERVER_URL = localStorage.getItem('serverUrl') || '';
+        let allFiles = [];
+        let selectedFiles = new Set();
+        const list = document.getElementById('filesList');
+        const setup = document.getElementById('serverSetup');
+
+        // Auto-detect server from URL parameter
+        if (!SERVER_URL) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const serverParam = urlParams.get('server');
+            if (serverParam) {
+                localStorage.setItem('serverUrl', serverParam);
+                location.reload();
+            }
+        }
+
+        if (!SERVER_URL) {
+            // Auto-detect server from current origin
+            autoDetectServer();
+        } else {
+            setup.style.display = 'none';
+            loadFiles();
+        }
+
+        async function autoDetectServer() {
+            const ports = [3000, 8080, 5000, 4000];
+            const protocol = window.location.protocol;
+            const host = window.location.hostname;
+
+            for (const port of ports) {
+                try {
+                    const url = `${protocol}//${host}:${port}`;
+                    const res = await fetch(`${url}/api/files/free`, { method: 'HEAD' });
+                    if (res.ok || res.status === 401 || res.status === 200) {
+                        localStorage.setItem('serverUrl', url);
+                        location.reload();
+                        return;
+                    }
+                } catch (e) {}
+            }
+
+            // No server found
+            list.innerHTML = `
+                <div class="empty">
+                    <div class="empty-icon">🔗</div>
+                    <div class="empty-text">Server not found</div>
+                    <div class="empty-hint">Make sure the server is running.<br>Or enter server URL above.</div>
+                </div>
+            `;
+        }
+
+        function saveServerUrl() {
+            const url = document.getElementById('serverUrlInput').value.trim();
+            if (url) {
+                localStorage.setItem('serverUrl', url);
+                location.reload();
+            }
+        }
+
+        async function loadFiles() {
+            if (!SERVER_URL) return;
+            try {
+                const res = await fetch(`${SERVER_URL}/api/files/free`);
+
+                if (res.status === 429) {
+                    const data = await res.json();
+                    list.innerHTML = `
+                        <div class="empty">
+                            <div class="empty-icon">⏳</div>
+                            <div class="empty-text">Too many requests</div>
+                            <div class="empty-hint">Please wait ${data.retryAfter || 60} seconds</div>
+                        </div>
+                    `;
+                    setTimeout(loadFiles, (data.retryAfter || 60) * 1000);
+                    return;
+                }
+
+                const files = await res.json();
+                allFiles = files;
+
+                if (files.length === 0) {
+                    list.innerHTML = `
+                        <div class="empty">
+                            <div class="empty-icon">📂</div>
+                            <div class="empty-text">No files available</div>
+                            <div class="empty-hint">Check back later for new content</div>
+                        </div>
+                    `;
+                    document.getElementById('filesHeader').style.display = 'none';
+                    return;
+                }
+
+                document.getElementById('filesHeader').style.display = 'flex';
+                document.getElementById('filesHeader').style.justifyContent = 'space-between';
+                document.getElementById('fileCount').textContent = `${files.length} file${files.length > 1 ? 's' : ''}`;
+
+                renderFiles();
+                updateSelectionUI();
+            } catch (err) {
+                list.innerHTML = `
+                    <div class="empty">
+                        <div class="empty-icon">❌</div>
+                        <div class="empty-text">Cannot connect to server</div>
+                        <div class="empty-hint">Check your server URL or try again</div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderFiles() {
+            list.innerHTML = allFiles.map((f, i) => `
+                <div class="file-item ${selectedFiles.has(f.filename) ? 'selected' : ''}" data-filename="${e(f.filename)}">
+                    <div class="file-checkbox">
+                        <input type="checkbox" id="file-${i}" ${selectedFiles.has(f.filename) ? 'checked' : ''} onchange="toggleFile('${e(f.filename)}')">
+                    </div>
+                    <div class="file-icon">📦</div>
+                    <div class="file-info">
+                        <div class="file-name" title="${e(f.name)}">${e(f.name)}</div>
+                        <div class="file-meta">
+                            <span>💾 ${fmt(f.size)}</span>
+                            <span>📥 ${f.downloads || 0} downloads</span>
+                            <span>📅 ${fmtDate(f.createdAt)}</span>
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-btn" onclick="downloadSingle('${e(f.filename)}', '${e(f.name)}', this)">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            Download
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleFile(filename) {
+            if (selectedFiles.has(filename)) {
+                selectedFiles.delete(filename);
+            } else {
+                selectedFiles.add(filename);
+            }
+            updateSelectionUI();
+            renderFiles();
+        }
+
+        function toggleSelectAll() {
+            if (selectedFiles.size === allFiles.length) {
+                // Deselect all
+                selectedFiles.clear();
+            } else {
+                // Select all
+                allFiles.forEach(f => selectedFiles.add(f.filename));
+            }
+            updateSelectionUI();
+            renderFiles();
+        }
+
+        function clearSelection() {
+            selectedFiles.clear();
+            updateSelectionUI();
+            renderFiles();
+        }
+
+        function updateSelectionUI() {
+            const count = selectedFiles.size;
+            const bar = document.getElementById('selectionBar');
+            const btn = document.getElementById('downloadSelectedBtn');
+            const selectAllBtn = document.getElementById('selectAllBtn');
+            const countEl = document.getElementById('selectedCount');
+            const sizeEl = document.getElementById('selectedSize');
+
+            if (allFiles.length === 0) {
+                bar.style.display = 'none';
+                return;
+            }
+
+            bar.style.display = 'flex';
+
+            countEl.textContent = count;
+
+            if (count === 0) {
+                btn.classList.remove('show');
+                selectAllBtn.textContent = 'Select All';
+                sizeEl.textContent = '';
+            } else {
+                btn.classList.add('show');
+                const totalSize = allFiles.filter(f => selectedFiles.has(f.filename)).reduce((sum, f) => sum + (f.size || 0), 0);
+                sizeEl.textContent = `(${fmt(totalSize)})`;
+                selectAllBtn.textContent = count === allFiles.length ? 'Deselect All' : 'Select All';
+            }
+        }
+
+        function downloadSingle(filename, name, btn) {
+            btn.classList.add('downloading');
+            btn.innerHTML = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Downloading...`;
+
+            const link = document.createElement('a');
+            link.href = `${SERVER_URL}/download/free/${encodeURIComponent(filename)}`;
+            link.download = name;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            setTimeout(() => {
+                btn.classList.remove('downloading');
+                btn.innerHTML = `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg> Download`;
+                toast('Download started!', 'success');
+            }, 1500);
+        }
+
+        async function downloadSelected() {
+            if (selectedFiles.size === 0) {
+                toast('Please select files first', 'error');
+                return;
+            }
+
+            const filesToDownload = allFiles.filter(f => selectedFiles.has(f.filename));
+            const progressModal = document.getElementById('progressModal');
+            const progressList = document.getElementById('progressList');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const progressTitle = document.getElementById('progressTitle');
+            const progressClose = document.getElementById('progressClose');
+
+            progressTitle.textContent = `Downloading ${filesToDownload.length} File(s)...`;
+            progressList.innerHTML = '';
+            progressFill.style.width = '0%';
+            progressText.textContent = 'Preparing...';
+            progressClose.style.display = 'none';
+            progressModal.classList.add('active');
+
+            let completed = 0;
+            let errors = 0;
+
+            for (let i = 0; i < filesToDownload.length; i++) {
+                const file = filesToDownload[i];
+
+                // Add progress item
+                const item = document.createElement('div');
+                item.className = 'progress-item current';
+                item.id = `progress-item-${i}`;
+                item.innerHTML = `<span>⏳ ${e(file.name)}</span><span>Pending</span>`;
+                progressList.appendChild(item);
+
+                // Update status for previous items
+                for (let j = 0; j < i; j++) {
+                    const prevItem = document.getElementById(`progress-item-${j}`);
+                    if (prevItem && prevItem.className.includes('current')) {
+                        prevItem.className = 'progress-item completed';
+                        prevItem.innerHTML = `<span>✅ ${e(filesToDownload[j].name)}</span><span>Done</span>`;
+                    }
+                }
+
+                try {
+                    // Create download link
+                    const link = document.createElement('a');
+                    link.href = `${SERVER_URL}/download/free/${encodeURIComponent(file.filename)}`;
+                    link.download = file.name;
+                    link.target = '_blank';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    // Mark as completed
+                    item.className = 'progress-item completed';
+                    item.innerHTML = `<span>✅ ${e(file.name)}</span><span>Done</span>`;
+                    completed++;
+
+                } catch (err) {
+                    item.className = 'progress-item error';
+                    item.innerHTML = `<span>❌ ${e(file.name)}</span><span>Failed</span>`;
+                    errors++;
+                }
+
+                // Update progress
+                const percent = ((i + 1) / filesToDownload.length) * 100;
+                progressFill.style.width = percent + '%';
+                progressText.textContent = `${i + 1} of ${filesToDownload.length} files`;
+
+                // Small delay between downloads
+                if (i < filesToDownload.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
+
+            // Final update
+            progressFill.style.width = '100%';
+            if (errors === 0) {
+                progressText.textContent = `All ${completed} file(s) downloaded!`;
+                progressTitle.textContent = '✅ Download Complete!';
+            } else {
+                progressText.textContent = `${completed} succeeded, ${errors} failed`;
+                progressTitle.textContent = '⚠️ Download Complete';
+            }
+            progressClose.style.display = 'inline-block';
+
+            toast(`${completed} download(s) started!`, 'success');
+        }
+
+        function closeProgressModal() {
+            document.getElementById('progressModal').classList.remove('active');
+        }
+
+        function toast(message, type = 'info') {
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.textContent = message;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        function fmt(b) { if (!b) return '0 B'; const s=['B','KB','MB','GB']; const i=Math.floor(Math.log(b)/Math.log(1024)); return Math.round(b/Math.pow(1024,i)*100)/100+' '+s[i]; }
+        function fmtDate(d) { if (!d) return '-'; return new Date(d).toLocaleDateString('en', {month:'short',day:'numeric',year:'numeric'}); }
+        function e(t) { if (!t) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+    </script>
+</body>
+</html>

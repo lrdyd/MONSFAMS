@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Uploads (file storage)
+uploads/
+*.apk
+*.exe
+*.zip
+*.rar
+*.7z
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pm2.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Build output
+dist/
+build/
+
+# Backup files
+*.backup
+*.bak

@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:minimax-algeng-chat-tts-us.oss-us-east-1.aliyuncs.com)",
+      "Bash(powershell -Command '@'\\\\'' *)",
+      "Bash(python generate.py)",
+      "Bash(py generate.py)",
+      "Bash(powershell -Command \"cd 'c:\\\\Users\\\\Q-code\\\\Documents\\\\webdc'; python generate.py\")",
+      "Bash(powershell -Command \"Set-Location 'c:\\\\Users\\\\Q-code\\\\Documents\\\\webdc'; Get-Content generate.py | python\")",
+      "Bash(node gen.js)",
+      "Bash(node --check server.js)",
+      "Bash(copy \"C:\\\\Users\\\\Q-code\\\\Documents\\\\webdc\\\\premium-download.html\" \"C:\\\\Users\\\\Q-code\\\\Documents\\\\webdc\\\\server\\\\public\\\\premium-download.html\")",
+      "Bash(copy \"C:\\\\Users\\\\Q-code\\\\Documents\\\\webdc\\\\free-executor.html\" \"C:\\\\Users\\\\Q-code\\\\Documents\\\\webdc\\\\server\\\\public\\\\free-executor.html\")",
+      "Bash(echo \"Test\")",
+      "Read(//tmp/**)",
+      "Bash(cat >> *)",
+      "Bash(python3)",
+      "Read(//c/Users/Public/Airdndrop/server/**)",
+      "Read(//c/Users/Public/Airdndrop/**)",
+      "Bash(copy \"C:\\\\Users\\\\Q-code\\\\Documents\\\\webdc\\\\server\\\\public\\\\admin.html\" \"C:\\\\Users\\\\Q-code\\\\Documents\\\\webdc\\\\server\\\\admin.html\")",
+      "Bash(node -e \"console.log\\('Server syntax OK'\\)\")",
+      "Bash(node -e \"require\\('./server.js'\\); console.log\\('Server syntax OK'\\)\")"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
+    ]
+  }
+}
