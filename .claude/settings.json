@@ -19,7 +19,8 @@
       "Read(//c/Users/Public/Airdndrop/**)",
       "Bash(copy \"C:\\\\Users\\\\Q-code\\\\Documents\\\\webdc\\\\server\\\\public\\\\admin.html\" \"C:\\\\Users\\\\Q-code\\\\Documents\\\\webdc\\\\server\\\\admin.html\")",
       "Bash(node -e \"console.log\\('Server syntax OK'\\)\")",
-      "Bash(node -e \"require\\('./server.js'\\); console.log\\('Server syntax OK'\\)\")"
+      "Bash(node -e \"require\\('./server.js'\\); console.log\\('Server syntax OK'\\)\")",
+      "Bash(git add *)"
     ],
     "additionalDirectories": [
       "\\tmp"
